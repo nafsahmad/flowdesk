@@ -1,3 +1,22 @@
+def get_all_contacts(properties, page_size=100):
+    """Fetch every contact, one page at a time. Return them all in one list."""
+    contacts = []
+    params = {"limit": page_size, "properties": ",".join(properties)}
+    page = 1
+    while True:
+        data = call_api("GET", "/crm/v3/objects/contacts", params=params)
+        if data is None:
+            raise RuntimeError(f"Stopped on page {page}. See the error above.")
+        contacts.extend(data["results"])
+        print(f"Page {page}: got {len(data['results'])} contacts")
+        next_page = data.get("paging", {}).get("next")
+        if not next_page:
+            break
+        params["after"] = next_page["after"]
+        page += 1
+    return contacts
+
+
 """Small helper for talking to the HubSpot API.
 
 Every FlowDesk script and Lambda imports call_api from here,
