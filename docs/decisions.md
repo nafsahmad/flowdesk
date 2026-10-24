@@ -27,3 +27,11 @@
 | flowdesk-local | Windows environment variable `HUBSPOT_KEY` | crm.objects.contacts.read, crm.objects.contacts.write | 2026-10-24 | 2027-04-24 |
 
 **Why only two scopes:** my scripts only read and update contacts. A key limited to that can't do much damage if it leaks.
+
+
+## 2026-10-24: Reading Tally submissions
+
+- Questions are matched by **label**, ignoring capitals, because Tally's keys are random strings. Risk: renaming a question in Tally silently drops that field (there's a test proving it). Rule: never rename form questions without updating `LABEL_TO_PROPERTY`.
+- Blank answers aren't sent to HubSpot, so a returning lead's existing details are never wiped.
+- A submission with no email, or an obviously broken one, is rejected as an invalid lead.
+- Error messages name the submission ID, never the email, so logs hold no personal data.
