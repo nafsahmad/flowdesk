@@ -1,1 +1,29 @@
 # Decisions
+## 2026-10-24: Lead scoring rules (v1)
+
+**What:** Every contact gets a score from 0 to 100, saved in `fd_score`.
+
+| Signal | Points | How it's checked |
+|---|---|---|
+| Senior job title | +40 | Job title contains "head", "director" or "founder", ignoring capital letters |
+| Company of 10 or more people | +30 | `fd_company_size` is 10 or higher |
+| Company name filled in | +15 | Company name isn't blank |
+| Came from a campaign | +15 | `fd_utm_campaign` isn't blank |
+
+**Edge cases**
+- A blank field scores 0 for that rule. A completely blank contact scores 0, and the script must not crash.
+- A company size of exactly 10 counts.
+- "Manager" doesn't count as senior in v1, because Managers often recommend but don’t sign off on purchases.
+
+**Why these rules:** FlowDesk sells to B2B teams, so decision-makers at real companies are the best leads. A campaign source means they came in through our marketing.
+
+**What I'd change with real data:** Check which scores actually became customers, then adjust the points.
+
+
+## 2026-10-24: HubSpot key for local scripts
+
+| Key name | Stored in | Scopes | Created | Rotate by |
+|---|---|---|---|---|
+| flowdesk-local | Windows environment variable `HUBSPOT_KEY` | crm.objects.contacts.read, crm.objects.contacts.write | 2026-10-24 | 2027-04-24 |
+
+**Why only two scopes:** my scripts only read and update contacts. A key limited to that can't do much damage if it leaks.
