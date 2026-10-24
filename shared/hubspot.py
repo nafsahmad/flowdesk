@@ -59,6 +59,11 @@ def call_api(method, path, params=None, body=None):
         return {}
     return r.json()
 
+def update_contact(contact_id, properties):
+    """Change some properties on one contact. Return the updated contact, or None."""
+    return call_api("PATCH", f"/crm/v3/objects/contacts/{contact_id}",
+                    body={"properties": properties})
+
 
 if __name__ == "__main__":
     # Quick self-test: fetch one contact and show its email.
