@@ -25,6 +25,7 @@
 | Key name | Stored in | Scopes | Created | Rotate by |
 |---|---|---|---|---|
 | flowdesk-local | Windows environment variable `HUBSPOT_KEY` | crm.objects.contacts.read, crm.objects.contacts.write | 2026-10-24 | 2027-04-24 |
+| flowdesk-lead-intake | Lambda environment variable on flowdesk-lead-intake | crm.objects.contacts.read, crm.objects.contacts.write | 2026-10-24 | 2027-04-24 |
 
 **Why only two scopes:** my scripts only read and update contacts. A key limited to that can't do much damage if it leaks.
 
@@ -35,3 +36,9 @@
 - Blank answers aren't sent to HubSpot, so a returning lead's existing details are never wiped.
 - A submission with no email, or an obviously broken one, is rejected as an invalid lead.
 - Error messages name the submission ID, never the email, so logs hold no personal data.
+
+## 2026-10-24: Upserting leads
+
+- Look up by email with `idProperty=email` (a direct read), then PATCH if found or POST if not.
+- Webhook code raises errors instead of returning None, so a failed run makes Tally retry.
+- Known limitation: if the same email is submitted twice within the same second, both runs could try to create it. HubSpot would reject the second with a 409. Handling that is a later improvement.
