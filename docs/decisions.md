@@ -42,3 +42,12 @@
 - Look up by email with `idProperty=email` (a direct read), then PATCH if found or POST if not.
 - Webhook code raises errors instead of returning None, so a failed run makes Tally retry.
 - Known limitation: if the same email is submitted twice within the same second, both runs could try to create it. HubSpot would reject the second with a 409. Handling that is a later improvement.
+| TALLY_SIGNING_SECRET | Tally webhook settings + Lambda env var on flowdesk-lead-intake | Signs and checks webhook requests | 2026-10-24 | 2027-04-24 |
+
+
+## 2026-10-24: Checking Tally signatures
+
+- Every request must carry a valid Tally-Signature (HMAC-SHA256 of the raw body, base64). Anything else gets a 401 and nothing is written.
+- The signature is checked on the raw body, before parsing, because re-saving the JSON could change it.
+- If the secret isn't configured, the Lambda returns 500 and rejects everything (fails closed), so Tally keeps retrying until it's fixed.
+- Rollout order: secret in Lambda, then in Tally, then deploy the code. That way no real submission is rejected during the change.

@@ -9,8 +9,12 @@
 | 2026-10-24 | Tally webhook with UTM link, sent to Webhook.site | All 3 hidden fields filled | utm_source=test, utm_campaign=oct-launch, utm_content=A. Type HIDDEN_FIELDS | Yes |
 | 2026-10-24 | Upsert from sample Tally payload, first run | New contact created, all properties verified | Created contact ID. Verified all 10 properties. Score 100, UTM fields filled | Yes |
 | 2026-10-24 | Same payload run again (duplicate check) | Same contact updated, no duplicate | Updated contact same ID. Only one Kemi Test in HubSpot | Yes |
-| 2026-10-24 | Lambda console test with sample Tally event | 200, Lead updated, received and written logs |  200, Lead updated, received and written logs |  |
+| 2026-10-24 | Lambda console test with sample Tally event | 200, Lead updated, received and written logs |  200, Lead updated, received and written logs | Yes |
 | 2026-10-24 | POST sample payload to API URL from laptop | 200, Lead updated | 200, message "Lead updated". Kemi updated in HubSpot | Yes |
 | 2026-10-24 | POST junk body to API URL | 400, Body must be JSON | 400 returned, shown in red by PowerShell. Nothing written to HubSpot | Yes |
 | 2026-10-24 | Live Tally submission, UTM B (Bola, Marketing Lead) | Created in HubSpot, score 60, UTMs filled | Bola Live created within seconds. fd_score 60, fd_utm_source linkedin, fd_utm_campaign oct-launch, fd_utm_content B. received and written lines in CloudWatch | Yes |
 | 2026-10-24 | Same email again, title changed to Head of Marketing | Same contact updated, score 100, no duplicate | One Bola Live in HubSpot, score now 100. Log shows action "updated" | Yes |
+| 2026-10-24 | D1: Unsigned POST from laptop after signature check deployed | 401, nothing written | 401 returned (red in PowerShell). No change in HubSpot. CloudWatch: step "signature", status "rejected" | Yes |
+| 2026-10-24 | D2: Lambda console test event (no signature header) | Function succeeds but returns 401 | Green "succeeded" box, response statusCode 401, "Invalid signature" | Yes |
+| 2026-10-24 | D3: Signed live Tally submission (Chioma, Founder, 5 people, UTM A) | Created in HubSpot, score 70 | Chioma Signed created. fd_score 70, UTMs filled. received and written lines in CloudWatch | Yes |
+| 2026-10-24 | D4: Wrong secret in Lambda, then fixed | Rejected, then recovered by Tally's retry | Submission rejected (signature mismatch in logs), nothing in HubSpot. After restoring the secret, Tally's retry delivered it and the lead appeared | Yes |

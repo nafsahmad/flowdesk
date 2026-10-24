@@ -7,6 +7,10 @@ properties to save, or a reason the lead can't be saved.
 
 import re
 
+import base64
+import hashlib
+import hmac
+
 # Tally label (lowercase) -> HubSpot internal property name.
 # Matching ignores capitals, so "First Name" and "First name" both work.
 LABEL_TO_PROPERTY = {
@@ -27,6 +31,15 @@ EMAIL_PATTERN = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
 class InvalidLead(Exception):
     """Raised when a submission can never become a contact."""
+
+def signature_is_valid(raw_body, signature, secret):
+    """True if Tally's signature matches this exact body and our secret."""
+    if not signature or not secret:
+        return False
+    expected = base64.b64encode(
+        hmac.new(secret.encode("utf-8"), raw_body, hashlib.sha256).digest()
+    ).decode("utf-8")
+    return hmac.compare_digest(expected, signature)
 
 
 def parse_tally(payload):
