@@ -66,3 +66,12 @@
 - Three guards against the Lambda triggering itself: the code skips anything outside `briefs/`, the trigger only watches `briefs/`, and the IAM policy only allows writing to `content/`.
 - Least privilege: the Lambda can read `briefs/`, write `content/` and call Nova 2 Lite. Nothing else.
 - Broken briefs are rejected before any model call. Model failures raise, so AWS retries the run.
+
+| WP_APP_PASSWORD (flowdesk-publisher) | Windows env var, later Lambda env var | WordPress application password for the InstaWP lab | 2026-10-25 | 2027-04-25 |
+
+## 2026-10-25: WordPress lab
+
+- Self-hosted WordPress on an InstaWP Sandbox site ($2 a month, billed daily, permanent site). It's the same kind of WordPress most companies run.
+- API login uses an application password over HTTPS. It can be revoked without touching the admin login.
+- Search engines discouraged, so test posts stay out of Google.
+- Cost control: delete the site after interviews. A paused site is still billed.

@@ -25,3 +25,4 @@
 | 2026-10-25 | Upload good brief to S3 (fake model) | Draft saved, status checked | content/onboarding-checklist/draft.json created within seconds. status "checked", model "fake", prompt versions v1, judge 5/5/4 with no made-up claims. Logs show received then saved | Yes |
 | 2026-10-25 | Upload trap brief to S3 (fake model) | Draft saved, failed_checks, made-up claim flagged | content/results-promise/draft.json created. status "failed_checks". Judge flagged "onboard clients 3x faster" on the blog and caption A | Yes |
 | 2026-10-25 | Upload broken brief | Rejected in logs, nothing written | Logs: step "validate", status "rejected", reason "missing audience, offer, facts". Nothing created in content/ | Yes |
+| 2026-10-25 | First real Nova run (onboarding-checklist) | Draft saved with model us.amazon.nova-2-lite-v1:0 | status checked | Yes |
