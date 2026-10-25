@@ -26,3 +26,7 @@
 | 2026-10-25 | Upload trap brief to S3 (fake model) | Draft saved, failed_checks, made-up claim flagged | content/results-promise/draft.json created. status "failed_checks". Judge flagged "onboard clients 3x faster" on the blog and caption A | Yes |
 | 2026-10-25 | Upload broken brief | Rejected in logs, nothing written | Logs: step "validate", status "rejected", reason "missing audience, offer, facts". Nothing created in content/ | Yes |
 | 2026-10-25 | First real Nova run (onboarding-checklist) | Draft saved with model us.amazon.nova-2-lite-v1:0 | status checked | Yes |
+| 2026-10-25 | WordPress formatting and link tests | 6 of 6 | 6 of 6 passed | Yes |
+| 2026-10-25 | Local: checked record -> WordPress draft | Draft created and verified (status, title, link, category) | Draft created in the FlowDesk category. Script printed "Verified: it's a draft, with the right title, tracked link and category" | Yes |
+| 2026-10-25 | Preview link opens Tally with UTMs | utm_source=blog, utm_campaign=onboarding-checklist, utm_content=blog | Clicked "Pick a time here" in preview. Tally opened with all three UTM values in the address bar | Yes |
+| 2026-10-25 | Revoked application password | 401 from WordPress, then fixed with a new password | 401 after revoking. New application password created, WP_APP_PASSWORD updated, script worked again | Yes |
