@@ -1,0 +1,2 @@
+| 2026-10-25 | blog | v3 | Asked for 7 paragraphs of 4 or 5 full sentences instead of words per paragraph | v2 fixed questions and em dashes, but Nova wrote 160 words (about 23 per paragraph). It undershoots word targets consistently |
+| 2026-10-25 | caption | v3 | Asked for 5 or 6 full sentences instead of about 60 words | v2 captions came in at 36 and 37 words |

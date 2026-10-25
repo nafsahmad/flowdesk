@@ -75,3 +75,9 @@
 - API login uses an application password over HTTPS. It can be revoked without touching the admin login.
 - Search engines discouraged, so test posts stay out of Google.
 - Cost control: delete the site after interviews. A paused site is still billed.
+
+## 2026-10-25: Repair loop
+
+- If a draft breaks a rule, it's sent back to the model once, with its own draft and the exact failed checks. Then it's checked again.
+- Capped at one repair, so a stubborn model can't loop and run up costs.
+- Each record saves how many repairs were needed, so we can still measure how often the prompt works on its own.

@@ -30,3 +30,7 @@
 | 2026-10-25 | Local: checked record -> WordPress draft | Draft created and verified (status, title, link, category) | Draft created in the FlowDesk category. Script printed "Verified: it's a draft, with the right title, tracked link and category" | Yes |
 | 2026-10-25 | Preview link opens Tally with UTMs | utm_source=blog, utm_campaign=onboarding-checklist, utm_content=blog | Clicked "Pick a time here" in preview. Tally opened with all three UTM values in the address bar | Yes |
 | 2026-10-25 | Revoked application password | 401 from WordPress, then fixed with a new password | 401 after revoking. New application password created, WP_APP_PASSWORD updated, script worked again | Yes |
+| 2026-10-25 | Nova, prompts v2 | Status checked | failed_checks. Questions and em dashes fixed. Only length failed: blog 160 words, captions 36 and 37 | No |
+| 2026-10-25 | Nova, prompts v3 + repair loop, run 1 of 3 | Status checked | checked. Repairs and judge scores not recorded (record overwritten by later runs) | Yes |
+| 2026-10-25 | Nova, prompts v3 + repair loop, run 2 of 3 | Status checked | checked. Repairs and judge scores not recorded (record overwritten by later runs) | Yes |
+| 2026-10-25 | Nova, prompts v3 + repair loop, run 3 of 3 | Status checked | checked. Repairs: blog 1, captions 0. Judge: blog 5/5/5, caption A 5/5/5, caption B 5/5/5, no made-up claims | Yes |

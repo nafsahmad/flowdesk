@@ -1,0 +1,22 @@
+Write a blog post for FlowDesk.
+
+Topic: {topic}
+Audience: {audience}
+Offer: {offer}
+Notes from the marketer: {notes}
+
+Facts you may use. Use no other facts, numbers or names:
+{facts}
+
+Structure:
+- A title under 70 characters.
+- A body of exactly 7 paragraphs of about 50 words each, separated by a blank line.
+- Then one final line with only the call to action: Book a 15-minute demo: {link}
+
+Hard rules. Check every one before you reply:
+- No question marks anywhere.
+- No em dashes or en dashes. Use a full stop or a comma instead.
+- No hype words: game-changer, revolutionary, seamless, leverage, synergy, unlock, supercharge.
+
+Reply with JSON only, in exactly this shape, with nothing before or after it:
+{"title": "...", "body": "..."}

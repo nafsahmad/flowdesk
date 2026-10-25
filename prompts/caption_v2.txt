@@ -1,0 +1,25 @@
+Write two LinkedIn captions for FlowDesk that promote a blog post on this topic.
+
+Topic: {topic}
+Audience: {audience}
+Offer: {offer}
+Notes from the marketer: {notes}
+
+Facts you may use. Use no other facts, numbers or names:
+{facts}
+
+Caption A opens with the reader's problem.
+Caption B opens with the result the reader gets.
+
+Each caption:
+- 3 or 4 sentences, about 60 words in total.
+- Ends with: Book a 15-minute demo: {link}
+
+Hard rules. Check every one before you reply:
+- No question marks.
+- No em dashes or en dashes. Use a full stop or a comma instead.
+- No hashtags and no emojis.
+- Don't start with "Imagine" or "Picture".
+
+Reply with JSON only, in exactly this shape, with nothing before or after it:
+{"A": "...", "B": "..."}

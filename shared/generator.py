@@ -1,7 +1,8 @@
 """Turns a brief into checked drafts: a blog post and captions A and B.
 
-Flow: fill the prompts, ask the model, read its JSON, run the rule checks,
-then (only if the rules pass) ask the judge. Returns one record with
+Flow: fill the prompts, ask the model, read its JSON, run the rule checks.
+If a rule fails, send the draft back once with the exact problems (the repair
+loop). Only if every rule passes does the judge run. Returns one record with
 everything, including how it was made.
 """
 
@@ -12,8 +13,9 @@ from shared import llm
 from shared.checks import check_blog, check_copy, passed
 from shared.prompts import brief_values, fill, load
 
-PROMPT_VERSIONS = {"blog": "v1", "caption": "v1", "judge": "v1"}
+PROMPT_VERSIONS = {"blog": "v3", "caption": "v3", "judge": "v1"}
 MIN_JUDGE_SCORE = 4
+MAX_REPAIRS = 1
 
 
 class GenerationError(Exception):
@@ -40,6 +42,37 @@ def ask_for_json(system_prompt, user_prompt, required_keys):
     raise GenerationError(f"No usable JSON with keys {required_keys} after 2 tries")
 
 
+def failures(checks_by_piece):
+    """Turn failed checks into plain sentences the model can act on."""
+    return [f"{piece}, {check}: {reason}"
+            for piece, checks in checks_by_piece.items()
+            for check, reason in checks.items() if reason != "pass"]
+
+
+def repair_prompt(original_prompt, previous_reply, problems):
+    """The original task, the model's last attempt, and exactly what was wrong."""
+    return (original_prompt
+            + "\n\nYour previous reply was:\n" + json.dumps(previous_reply)
+            + "\n\nIt broke these rules:\n" + "\n".join(f"- {p}" for p in problems)
+            + "\n\nRewrite it so every problem above is fixed, and keep everything that "
+              "was already right. Reply with JSON only, in the same shape.")
+
+
+def write_and_repair(brand_rules, prompt, keys, run_checks):
+    """Ask, check, and if any rule fails, ask once more with the problems listed.
+
+    Returns (reply, checks, number of repairs used).
+    """
+    reply = ask_for_json(brand_rules, prompt, keys)
+    checks = run_checks(reply)
+    repairs = 0
+    while failures(checks) and repairs < MAX_REPAIRS:
+        repairs += 1
+        reply = ask_for_json(brand_rules, repair_prompt(prompt, reply, failures(checks)), keys)
+        checks = run_checks(reply)
+    return reply, checks, repairs
+
+
 def judge(brand_rules, values, copy, platform):
     """Ask the judge to score one piece of copy."""
     prompt = fill(load(f"judge_{PROMPT_VERSIONS['judge']}.txt"),
@@ -60,18 +93,21 @@ def generate(brief):
     brand_rules = load("brand_rules.md")
     values = brief_values(brief)
 
-    blog = ask_for_json(brand_rules,
-                        fill(load(f"blog_{PROMPT_VERSIONS['blog']}.txt"), values),
-                        ["title", "body"])
-    captions = ask_for_json(brand_rules,
-                            fill(load(f"caption_{PROMPT_VERSIONS['caption']}.txt"), values),
-                            ["A", "B"])
+    blog, blog_checks, blog_repairs = write_and_repair(
+        brand_rules,
+        fill(load(f"blog_{PROMPT_VERSIONS['blog']}.txt"), values),
+        ["title", "body"],
+        lambda b: {"blog": check_blog(b["title"], b["body"])},
+    )
+    captions, caption_checks, caption_repairs = write_and_repair(
+        brand_rules,
+        fill(load(f"caption_{PROMPT_VERSIONS['caption']}.txt"), values),
+        ["A", "B"],
+        lambda c: {"caption_A": check_copy(c["A"], 40, 80, social=True),
+                   "caption_B": check_copy(c["B"], 40, 80, social=True)},
+    )
 
-    rule_checks = {
-        "blog": check_blog(blog["title"], blog["body"]),
-        "caption_A": check_copy(captions["A"], 40, 80, social=True),
-        "caption_B": check_copy(captions["B"], 40, 80, social=True),
-    }
+    rule_checks = {**blog_checks, **caption_checks}
     rules_ok = all(passed(r) for r in rule_checks.values())
 
     verdicts = {}
@@ -88,6 +124,7 @@ def generate(brief):
         "status": "checked" if rules_ok and judge_ok else "failed_checks",
         "model": llm.model_name(),
         "prompt_versions": PROMPT_VERSIONS,
+        "repairs": {"blog": blog_repairs, "captions": caption_repairs},
         "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "blog": blog,
         "captions": captions,

@@ -65,4 +65,5 @@ def lambda_handler(event, context):
         s3.put_object(Bucket=bucket, Key=out_key,
                       Body=json.dumps(draft, indent=2).encode("utf-8"),
                       ContentType="application/json")
-        log(step="saved", key=out_key, status=draft["status"], model=draft["model"])
+        log(step="saved", key=out_key, status=draft["status"], model=draft["model"],
+            repairs=draft["repairs"])
