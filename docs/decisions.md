@@ -59,3 +59,10 @@
 - All model calls go through `shared/llm.py`. With FLOWDESK_FAKE_LLM=1 it returns ready-made replies in Bedrock's JSON shape, so everything else can be built and tested now.
 - Every draft records `"model": "fake"` when the fake was used, so fake output can never be mistaken for real output.
 - When the quota arrives: remove FLOWDESK_FAKE_LLM and rerun. No other code changes.
+
+## 2026-10-25: Content generator in AWS
+
+- Briefs go in `briefs/`, drafts come out in `content/<brief_id>/draft.json`. The Lambda is triggered by new .json files in `briefs/` only.
+- Three guards against the Lambda triggering itself: the code skips anything outside `briefs/`, the trigger only watches `briefs/`, and the IAM policy only allows writing to `content/`.
+- Least privilege: the Lambda can read `briefs/`, write `content/` and call Nova 2 Lite. Nothing else.
+- Broken briefs are rejected before any model call. Model failures raise, so AWS retries the run.

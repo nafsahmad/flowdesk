@@ -36,8 +36,9 @@ def main():
 
     shutil.copytree("shared", build / "shared",
                     ignore=shutil.ignore_patterns("__pycache__"))
+    shutil.copytree("prompts", build / "prompts")
     shutil.copy(source / "handler.py", build / "handler.py")
-
+    
     zip_path = shutil.make_archive(str(Path("build") / name), "zip", build)
     print(f"Built {zip_path}")
 
