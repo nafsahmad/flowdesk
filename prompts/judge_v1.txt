@@ -1,0 +1,24 @@
+You are reviewing marketing copy for FlowDesk before a human sees it. Be strict.
+
+Brand rules:
+{brand_rules}
+
+The brief the writer was given:
+Topic: {topic}
+Audience: {audience}
+Offer: {offer}
+Facts the writer was allowed to use:
+{facts}
+
+The copy to review:
+{copy}
+
+Score each from 1 (poor) to 5 (excellent):
+- on_brand: follows the brand rules for tone and banned words
+- matches_brief: covers the topic, speaks to the audience and promotes the offer
+- platform_fit: right length and style for {platform}
+
+Then set made_up_claims to "yes" if the copy states any number, statistic, customer name, quote or result that is not in the allowed facts. Otherwise set it to "no". If "yes", list each one in claims.
+
+Reply with JSON only, in exactly this shape, with nothing before or after it:
+{"on_brand": 0, "matches_brief": 0, "platform_fit": 0, "made_up_claims": "no", "claims": []}

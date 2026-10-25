@@ -1,0 +1,17 @@
+Write a short blog post for FlowDesk.
+
+Topic: {topic}
+Audience: {audience}
+Offer: {offer}
+Notes from the marketer: {notes}
+
+Facts you may use. Use no other facts, numbers or names:
+{facts}
+
+Requirements:
+- A title under 70 characters.
+- A body of 250 to 400 words, in short paragraphs.
+- End with the call to action from the brand rules, writing {link} exactly as shown.
+
+Reply with JSON only, in exactly this shape, with nothing before or after it:
+{"title": "...", "body": "..."}
