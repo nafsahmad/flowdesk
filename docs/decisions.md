@@ -51,3 +51,11 @@
 - The signature is checked on the raw body, before parsing, because re-saving the JSON could change it.
 - If the secret isn't configured, the Lambda returns 500 and rejects everything (fails closed), so Tally keeps retrying until it's fixed.
 - Rollout order: secret in Lambda, then in Tally, then deploy the code. That way no real submission is rejected during the change.
+
+
+## 2026-10-25: Building against a fake model while Bedrock is blocked
+
+- Bedrock returned "too many tokens per day" on the first request (new-account quota). Quota increase requested, and support case opened.
+- All model calls go through `shared/llm.py`. With FLOWDESK_FAKE_LLM=1 it returns ready-made replies in Bedrock's JSON shape, so everything else can be built and tested now.
+- Every draft records `"model": "fake"` when the fake was used, so fake output can never be mistaken for real output.
+- When the quota arrives: remove FLOWDESK_FAKE_LLM and rerun. No other code changes.

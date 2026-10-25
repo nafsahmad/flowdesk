@@ -18,3 +18,7 @@
 | 2026-10-24 | D2: Lambda console test event (no signature header) | Function succeeds but returns 401 | Green "succeeded" box, response statusCode 401, "Invalid signature" | Yes |
 | 2026-10-24 | D3: Signed live Tally submission (Chioma, Founder, 5 people, UTM A) | Created in HubSpot, score 70 | Chioma Signed created. fd_score 70, UTMs filled. received and written lines in CloudWatch | Yes |
 | 2026-10-24 | D4: Wrong secret in Lambda, then fixed | Rejected, then recovered by Tally's retry | Submission rejected (signature mismatch in logs), nothing in HubSpot. After restoring the secret, Tally's retry delivered it and the lead appeared | Yes |
+| 2026-10-25 | Rule checks on good and broken captions | 11 of 11 | 11 of 11 | Yes |
+| 2026-10-25 | Generator tests with fake model | 8 of 8 | 8 of 8 | Yes |
+| 2026-10-25 | Fake run, onboarding-checklist brief | status checked | No maid up claims | Yes |
+| 2026-10-25 | Fake run, results-promise (trap) brief | failed_checks, judge flags made-up claim | failed_check, flags made-up claim | Yes |
