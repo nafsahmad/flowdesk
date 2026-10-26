@@ -26,7 +26,7 @@ def test_repair_loop():
     ])
     sent = []
 
-    def fake_ask(system_prompt, user_prompt, max_tokens=2000):
+    def fake_ask(system_prompt, user_prompt, **kwargs):
         sent.append(user_prompt)
         return next(replies)
 

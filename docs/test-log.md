@@ -34,3 +34,4 @@
 | 2026-10-25 | Nova, prompts v3 + repair loop, run 1 of 3 | Status checked | checked. Repairs and judge scores not recorded (record overwritten by later runs) | Yes |
 | 2026-10-25 | Nova, prompts v3 + repair loop, run 2 of 3 | Status checked | checked. Repairs and judge scores not recorded (record overwritten by later runs) | Yes |
 | 2026-10-25 | Nova, prompts v3 + repair loop, run 3 of 3 | Status checked | checked. Repairs: blog 1, captions 0. Judge: blog 5/5/5, caption A 5/5/5, caption B 5/5/5, no made-up claims | Yes |
+| 2026-10-26 | Trap brief (results-promise), Nova, judge v1 | failed_checks, made-up claims flagged | failed_checks. Repairs: blog 1, captions 1. Judge flagged 4 promised results in the blog and 2 in caption B. Missed: invented features ("connect it to your CRM", "set it up in minutes"), the same claim in caption A (5/5/5), and the CTA not matching the trial offer | Partly |

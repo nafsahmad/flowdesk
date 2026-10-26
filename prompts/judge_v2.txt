@@ -1,0 +1,36 @@
+You are reviewing marketing copy for FlowDesk before a human sees it. Be strict. Your job is to stop the brand from saying anything it can't back up.
+
+Brand rules:
+{brand_rules}
+
+The brief the writer was given:
+Topic: {topic}
+Audience: {audience}
+Offer: {offer}
+Facts the writer was allowed to use:
+{facts}
+
+The copy to review:
+{copy}
+
+Step 1. Read the copy sentence by sentence. Find every sentence that says what FlowDesk does, or what the reader will get from it.
+
+Step 2. For each of those sentences, decide whether the allowed facts support it. These count as made-up claims:
+- Invented features. Examples: "updates in real time", "connects to your CRM", "set it up in minutes".
+- Promised results. Examples: "saves hours each week", "projects begin faster", "take on more clients", "better outcomes".
+- Numbers, statistics, customer names or quotes that aren't in the facts.
+
+These are fine:
+- Describing the reader's problem.
+- Restating an allowed fact in different words.
+- A direct, obvious consequence of an allowed fact. For example, automatic reminders mean less manual chasing.
+
+Step 3. Score each from 1 (poor) to 5 (excellent):
+- on_brand: follows the brand rules for tone and banned words
+- matches_brief: covers the topic, speaks to the audience and promotes the offer
+- platform_fit: right length and style for {platform}
+
+Set made_up_claims to "yes" if you found any made-up claim, otherwise "no". List each one in claims, quoted word for word from the copy.
+
+Reply with JSON only, in exactly this shape, with nothing before or after it:
+{"on_brand": 0, "matches_brief": 0, "platform_fit": 0, "made_up_claims": "no", "claims": []}

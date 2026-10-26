@@ -20,7 +20,7 @@ def model_name():
     return "fake" if using_fake() else MODEL_ID
 
 
-def ask(system_prompt, user_prompt, max_tokens=2000):
+def ask(system_prompt, user_prompt, max_tokens=2000, temperature=0.7):
     """Send one prompt and return the model's reply as text."""
     if using_fake():
         return _fake_reply(user_prompt)
@@ -32,7 +32,7 @@ def ask(system_prompt, user_prompt, max_tokens=2000):
         modelId=MODEL_ID,
         system=[{"text": system_prompt}],
         messages=[{"role": "user", "content": [{"text": user_prompt}]}],
-        inferenceConfig={"maxTokens": max_tokens, "temperature": 0.7},
+        inferenceConfig={"maxTokens": max_tokens, "temperature": temperature},
     )
     blocks = response["output"]["message"]["content"]
     return "".join(block.get("text", "") for block in blocks)

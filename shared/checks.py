@@ -17,6 +17,15 @@ EMOJI = re.compile("[\U0001F300-\U0001FAFF\u2600-\u27BF]")
 EM_DASH = "\u2014"
 
 
+# Made-up claims the model has actually produced in our runs. Code catches these
+# for certain; the AI judge looks for new ones. Add to this list after each review.
+CLAIM_PHRASES = [
+    "real time", "real-time", "in minutes", "save hours", "saves hours",
+    "hours each week", "more clients", "integrates", "connects to",
+    "fits into your existing",
+]
+
+
 def check_copy(text, min_words, max_words, social=False):
     """Run every rule on one piece of copy. Returns {check name: "pass" or a reason}."""
     lower = text.lower()
@@ -32,6 +41,10 @@ def check_copy(text, min_words, max_words, social=False):
     results["banned_words"] = "pass" if not found else "uses " + ", ".join(found)
 
     results["questions"] = "pass" if "?" not in text else "contains a question"
+    
+    claims = [p for p in CLAIM_PHRASES if p in lower]
+    results["claim_phrases"] = ("pass" if not claims
+                                else "known made-up claim: " + ", ".join(claims))
 
     results["cta"] = ("pass" if CTA_AT_END.search(text)
                       else "doesn't end with the call to action and {link}")

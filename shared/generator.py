@@ -13,7 +13,7 @@ from shared import llm
 from shared.checks import check_blog, check_copy, passed
 from shared.prompts import brief_values, fill, load
 
-PROMPT_VERSIONS = {"blog": "v3", "caption": "v3", "judge": "v1"}
+PROMPT_VERSIONS = {"blog": "v3", "caption": "v3", "judge": "v2"}
 MIN_JUDGE_SCORE = 4
 MAX_REPAIRS = 1
 
@@ -33,10 +33,10 @@ def extract_json(reply):
         return None
 
 
-def ask_for_json(system_prompt, user_prompt, required_keys):
+def ask_for_json(system_prompt, user_prompt, required_keys, temperature=0.7):
     """Ask the model, and try once more if the reply isn't usable JSON."""
     for _attempt in range(2):
-        data = extract_json(llm.ask(system_prompt, user_prompt))
+        data = extract_json(llm.ask(system_prompt, user_prompt, temperature=temperature))
         if data is not None and all(key in data for key in required_keys):
             return data
     raise GenerationError(f"No usable JSON with keys {required_keys} after 2 tries")
@@ -79,7 +79,8 @@ def judge(brand_rules, values, copy, platform):
                   {**values, "brand_rules": brand_rules, "copy": copy,
                    "platform": platform})
     return ask_for_json("You are a strict, fair marketing editor.", prompt,
-                        ["on_brand", "matches_brief", "platform_fit", "made_up_claims"])
+                        ["on_brand", "matches_brief", "platform_fit", "made_up_claims"],
+                        temperature=0)
 
 
 def judge_passed(verdict):

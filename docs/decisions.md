@@ -81,3 +81,11 @@
 - If a draft breaks a rule, it's sent back to the model once, with its own draft and the exact failed checks. Then it's checked again.
 - Capped at one repair, so a stubborn model can't loop and run up costs.
 - Each record saves how many repairs were needed, so we can still measure how often the prompt works on its own.
+
+## 2026-10-26: Three layers against made-up claims
+
+- Writer prompts say what may and may not be claimed. Hard rules beat the marketer's notes.
+- Code checks a list of made-up claims seen in real runs (CLAIM_PHRASES). It's certain and free, and the list grows after each review.
+- The AI judge (v2) looks for new ones. It's stricter than v1 but over-flags a little and still misses some, so it's a filter, not the final word.
+- The human approval in WordPress is the final gate.
+- Prompt tuning is time-boxed: after v4, we move on unless results get worse.

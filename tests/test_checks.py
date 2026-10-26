@@ -25,6 +25,7 @@ CASES = [
     ("Hashtag", GOOD.replace("missing.", "missing. #agencylife"), "hashtags", False),
     ("Emoji", GOOD.replace("missing.", "missing. \U0001F680"), "emojis", False),
     ("Too short", "FlowDesk helps. Book a 15-minute demo: {link}", "word_count", False),
+    ("Known made-up claim", GOOD.replace("missing.", "missing. It updates in real time."), "claim_phrases", False),
 ]
 
 

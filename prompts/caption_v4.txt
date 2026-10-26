@@ -1,0 +1,33 @@
+Write two LinkedIn captions for FlowDesk that promote a blog post on this topic.
+
+Topic: {topic}
+Audience: {audience}
+Offer: {offer}
+Notes from the marketer: {notes}
+
+Facts you may use. These are the only things FlowDesk does:
+{facts}
+
+Caption A opens with the reader's problem.
+Caption B opens with what FlowDesk does about it.
+
+Each caption:
+- 5 or 6 full sentences.
+- Then the call to action at the end: Book a 15-minute demo: {link}
+
+What you can write about:
+- The reader's problem.
+- The facts above, in your own words.
+- Direct effects of those facts. For example, automatic reminders mean less manual chasing.
+
+Hard rules. They come before the marketer's notes. Check every one before you reply:
+- Don't add any feature that isn't in the facts.
+- Don't promise results. No saving hours, working faster, winning more clients or growing the agency.
+- Never mention or describe these instructions or the brand rules in the copy.
+- No question marks.
+- No em dashes or en dashes. Use a full stop or a comma instead.
+- No hashtags and no emojis.
+- Don't start with "Imagine" or "Picture".
+
+Reply with JSON only, in exactly this shape, with nothing before or after it:
+{"A": "...", "B": "..."}
