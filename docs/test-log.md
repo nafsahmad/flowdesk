@@ -46,3 +46,5 @@
 | 2026-10-26 | Drill 1: wrong HUBSPOT_KEY on lead-intake | Alarm email, 401 in logs, lead recovered by Tally retry after fix, OK email |    | Yes |
 | 2026-10-26 | Credential check, all healthy | 3 checked, 0 problems, no email | 3 checked, 0 problems, no email | Pass |
 | 2026-10-26 | Drill 2: revoked WordPress password | Email naming the WordPress password (401), then 0 problems after rotation |  |  |
+| 2026-10-26 | Saved Logs Insights searches (errors 24h, errors by Lambda, received vs written, never written, no variant) | All run and return sensible results |  |  |
+| 2026-10-26 | Drill 3: submission from the plain link (no UTMs) | No alarm. Lead in HubSpot with empty UTM fields. Caught by the "no variant" search |  |  |

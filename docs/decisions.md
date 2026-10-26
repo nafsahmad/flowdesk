@@ -98,3 +98,10 @@
 - It reads each key from the Lambda that uses it, so it tests the real key, not a copy. Its permission to read Lambda settings is limited to those two functions.
 - One email when anything fails, naming the key and what to do. If the checker itself crashes, its own Errors alarm fires instead.
 - Known limits: the HubSpot check only proves read access, not write. The Tally signing secret can't be tested from here. If the checker stopped running altogether, nothing would notice yet (fix later: an alarm when it hasn't run for a day). Long term, keys belong in Secrets Manager.
+
+## 2026-10-26: Saved log searches
+
+- Five saved Logs Insights searches in the FlowDesk folder: errors (24h), errors by Lambda (24h), leads received vs written (7d), leads never written (7d), leads with no variant (7d).
+- Lost-lead checks count distinct submission IDs, so Tally's retries don't look like lost leads.
+- lead-intake logs each lead's variant (or "none"), so leads without attribution can be found.
+- Alarms only catch crashes. Silent data problems, like missing attribution, are caught by the searches and the weekly report.

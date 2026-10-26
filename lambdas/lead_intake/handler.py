@@ -61,5 +61,6 @@ def lambda_handler(event, context):
     action, contact_id = upsert_contact(properties)  # a HubSpot error stops the run on purpose
 
     log(step="written", status="ok", submission=submission_id,
-        action=action, contact_id=contact_id, score=properties["fd_score"])
+        action=action, contact_id=contact_id, score=properties["fd_score"],
+        variant=properties.get("fd_utm_content") or "none")
     return reply(200, f"Lead {action}")
