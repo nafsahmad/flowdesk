@@ -8,7 +8,7 @@ import json
 import os
 
 MODEL_ID = os.environ.get("FLOWDESK_MODEL_ID", "us.amazon.nova-2-lite-v1:0")
-REGION = "us-east-1"
+REGION = "eu-north-1"
 
 
 def using_fake():

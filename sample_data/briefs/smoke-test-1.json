@@ -1,0 +1,11 @@
+{
+  "brief_id": "smoke-test-1",
+  "topic": "Stop chasing clients for logins in week one",
+  "audience": "Operations leads at small marketing agencies",
+  "offer": "A 15-minute demo",
+  "facts": [
+    "Clients share access to their ad accounts, analytics and website from one FlowDesk page",
+    "The agency sees at a glance which accesses are still missing",
+    "FlowDesk reminds clients automatically when something is still missing"
+  ]
+}

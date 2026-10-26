@@ -123,7 +123,6 @@ A marketer uploads a brief to S3. `flowdesk-content-generator` writes a blog pos
 | `Invalid URL ... No scheme supplied` | `WP_SITE` missing `https://` | Add it |
 | `WordPress returned 401` | Application password revoked or wrong | New application password, update `WP_APP_PASSWORD` |
 | `published with the review notes box still in it` | Post published before the box was deleted | Edit the post, delete the box, update. The next run marks it published |
-| Lambda logs link points to `eu-north-1` | Function created in the wrong region | Recreate in us-east-1 (the IAM role can be reused), delete the copy |
 
 **Safe to repeat:** yes, any time. Run it by hand from the Test tab (`manual-run`, event `{}`). It only ever moves records forward.
 

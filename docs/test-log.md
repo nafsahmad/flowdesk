@@ -41,7 +41,7 @@
 | 2026-10-26 | Box deleted, flags reviewed (2 kept / 2 rewritten / 1 deleted), published | Record published, live page verified, captions_ready | Run succeeded. Record moved to published, with the live URL, captions_ready (A and B with utm_content=A and B) and history showing in_wordpress then published. Live page has no box | Yes |
 | 2026-10-26 | Onboarding post approved and published | Record published | Promised results edited out during review. Published. Record moved to published, live page verified | Yes |
 | 2026-10-26 | Hourly schedule | Rule added, automatic run not yet confirmed | EventBridge rule flowdesk-publisher-hourly added (rate(1 hour)). Automatic run seen in CloudWatch logs | Pending |
-| 2026-10-26 | SNS topic flowdesk-alerts, test message | Email arrives | Topic created in us-east-1, email subscription confirmed. Test message "FlowDesk test alert" arrived in the inbox | Yes |
+| 2026-10-26 | SNS topic flowdesk-alerts, test message | Email arrives | Topic created in eu-north-1, email subscription confirmed. Test message "FlowDesk test alert" arrived in the inbox | Yes |
 | 2026-10-26 | Errors alarms on lead-intake, content-generator and publisher | All three created, OK state |    | Yes |
 | 2026-10-26 | Drill 1: wrong HUBSPOT_KEY on lead-intake | Alarm email, 401 in logs, lead recovered by Tally retry after fix, OK email |    | Yes |
 | 2026-10-26 | Credential check, all healthy | 3 checked, 0 problems, no email | 3 checked, 0 problems, no email | Pass |
