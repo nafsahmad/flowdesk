@@ -69,6 +69,8 @@
 
 | WP_APP_PASSWORD (flowdesk-publisher) | Windows env var, later Lambda env var | WordPress application password for the InstaWP lab | 2026-10-25 | 2027-04-25 |
 
+| WP_APP_PASSWORD (flowdesk-publisher-lambda) | Lambda env var on flowdesk-publisher | WordPress application password for the InstaWP lab | 2026-10-26 | 2027-04-26 |
+
 ## 2026-10-25: WordPress lab
 
 - Self-hosted WordPress on an InstaWP Sandbox site ($2 a month, billed daily, permanent site). It's the same kind of WordPress most companies run.

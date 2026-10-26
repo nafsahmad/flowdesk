@@ -4,7 +4,7 @@ Run from the flowdesk folder with:  python -m tests.test_wordpress_format
 """
 
 from shared.links import tracked_link
-from shared.wordpress import body_to_html
+from shared.wordpress import REVIEW_MARKER, body_to_html, review_notes_html
 
 BODY = ("Week one shouldn't be a chase.\n\n"
         "Contracts & forms arrive in one link.\n\n"
@@ -26,6 +26,9 @@ def main():
          "&utm_content=blog"),
         ("A URL that already has ? gets & instead",
          tracked_link("https://x.com/f?ref=1", "a", "b", "c").startswith("https://x.com/f?ref=1&utm_")),
+        ("Review box names the marker and each flagged sentence",
+         REVIEW_MARKER in review_notes_html({"blog": ["You get <updates>"]})
+         and "You get &lt;updates&gt;" in review_notes_html({"blog": ["You get <updates>"]})),
     ]
     for name, ok in checks:
         print(f"{'PASS' if ok else 'FAIL'}  {name}")

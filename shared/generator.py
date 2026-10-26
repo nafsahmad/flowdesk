@@ -13,8 +13,9 @@ from shared import llm
 from shared.checks import check_blog, check_copy, passed
 from shared.prompts import brief_values, fill, load
 
-PROMPT_VERSIONS = {"blog": "v3", "caption": "v3", "judge": "v2"}
+PROMPT_VERSIONS = {"blog": "v4", "caption": "v4", "judge": "v2"}
 MIN_JUDGE_SCORE = 4
+MIN_REVIEW_SCORE = 3
 MAX_REPAIRS = 1
 
 
@@ -83,10 +84,23 @@ def judge(brand_rules, values, copy, platform):
                         temperature=0)
 
 
+SCORE_KEYS = ("on_brand", "matches_brief", "platform_fit")
+
+
 def judge_passed(verdict):
-    scores_ok = all(verdict[k] >= MIN_JUDGE_SCORE
-                    for k in ("on_brand", "matches_brief", "platform_fit"))
+    scores_ok = all(verdict[k] >= MIN_JUDGE_SCORE for k in SCORE_KEYS)
     return scores_ok and verdict["made_up_claims"] == "no"
+
+
+def overall_status(rules_ok, verdicts):
+    """checked: clean. needs_review: the rules pass, but the judge flagged sentences
+    for a human to decide on. failed_checks: anything worse."""
+    if not rules_ok or not verdicts:
+        return "failed_checks"
+    if all(judge_passed(v) for v in verdicts.values()):
+        return "checked"
+    scores_ok = all(v[k] >= MIN_REVIEW_SCORE for v in verdicts.values() for k in SCORE_KEYS)
+    return "needs_review" if scores_ok else "failed_checks"
 
 
 def generate(brief):
@@ -118,11 +132,12 @@ def generate(brief):
             "caption_A": judge(brand_rules, values, captions["A"], "a LinkedIn caption"),
             "caption_B": judge(brand_rules, values, captions["B"], "a LinkedIn caption"),
         }
-    judge_ok = bool(verdicts) and all(judge_passed(v) for v in verdicts.values())
+    review_notes = {piece: v["claims"] for piece, v in verdicts.items() if v.get("claims")}
 
     return {
         "brief_id": brief["brief_id"],
-        "status": "checked" if rules_ok and judge_ok else "failed_checks",
+        "status": overall_status(rules_ok, verdicts),
+        "review_notes": review_notes,
         "model": llm.model_name(),
         "prompt_versions": PROMPT_VERSIONS,
         "repairs": {"blog": blog_repairs, "captions": caption_repairs},

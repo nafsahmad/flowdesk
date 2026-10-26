@@ -22,7 +22,7 @@ EM_DASH = "\u2014"
 CLAIM_PHRASES = [
     "real time", "real-time", "in minutes", "save hours", "saves hours",
     "hours each week", "more clients", "integrates", "connects to",
-    "fits into your existing",
+    "fits into your existing", "agencies using flowdesk", "minutes instead of hours", "live view",
 ]
 
 

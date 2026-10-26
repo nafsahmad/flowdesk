@@ -9,6 +9,7 @@ import os
 import requests
 
 TIMEOUT_SECONDS = 15
+REVIEW_MARKER = "FLOWDESK REVIEW NOTES"
 
 
 class WordPressError(Exception):
@@ -44,6 +45,18 @@ def body_to_html(body, link_url, link_text="Pick a time here"):
         blocks.append(f"<!-- wp:paragraph -->\n<p>{safe}</p>\n<!-- /wp:paragraph -->")
     return "\n\n".join(blocks)
 
+
+def review_notes_html(notes):
+    """A red box listing the judge's flagged sentences, for the approver to deal with."""
+    items = "".join(f"<li><strong>{html.escape(piece)}:</strong> {html.escape(claim)}</li>"
+                    for piece, claims in notes.items() for claim in claims)
+    return ("<!-- wp:html -->\n"
+            '<div style="border:2px solid #c00;padding:12px;margin-bottom:24px">'
+            f"<p><strong>{REVIEW_MARKER}. Delete this box before publishing.</strong></p>"
+            "<p>The AI judge flagged these sentences as possibly made up. Check each one "
+            "against the brief, then edit it, delete it or keep it.</p>"
+            f"<ul>{items}</ul></div>\n"
+            "<!-- /wp:html -->\n\n")
 
 def get_category_id(slug):
     """Find a category's id from its slug, for example "flowdesk"."""

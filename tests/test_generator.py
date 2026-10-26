@@ -11,6 +11,7 @@ os.environ["FLOWDESK_FAKE_LLM"] = "1"  # never call Bedrock from tests
 
 from shared import generator, llm  # noqa: E402
 from shared.generator import PROMPT_VERSIONS, extract_json, generate  # noqa: E402
+from shared.prompts import brief_values  # noqa: E402
 
 
 def load_brief(name):
@@ -57,8 +58,24 @@ def main():
 
     risky = generate(load_brief("results-promise"))
     checks.append(("Trap brief ends as failed_checks", risky["status"] == "failed_checks"))
-    checks.append(("Judge flagged the made-up claim",
-                   risky["judge"]["blog"]["made_up_claims"] == "yes"))
+    checks.append(("Code check caught the made-up claim before the judge",
+                   "agencies using flowdesk" in risky["rule_checks"]["blog"]["claim_phrases"]))
+
+    verdict = generator.judge("rules", brief_values(load_brief("results-promise")),
+                              "FlowDesk makes your team 3x faster.", "a blog post")
+    checks.append(("Judge flags a made-up claim the code doesn't know",
+                   verdict["made_up_claims"] == "yes"))
+    clean = {"on_brand": 5, "matches_brief": 5, "platform_fit": 4,
+             "made_up_claims": "no", "claims": []}
+    flagged = {**clean, "made_up_claims": "yes", "claims": ["You get updates"]}
+    poor = {**flagged, "on_brand": 2}
+    
+    checks.append(("Clean verdicts give checked",
+                   generator.overall_status(True, {"blog": clean}) == "checked"))
+    checks.append(("Flagged claims with decent scores give needs_review",
+                   generator.overall_status(True, {"blog": flagged}) == "needs_review"))
+    checks.append(("A score under 3 still fails",
+                   generator.overall_status(True, {"blog": poor}) == "failed_checks"))
 
     checks.append(("Repair loop fixes a short blog, sending the reasons back",
                    test_repair_loop()))
