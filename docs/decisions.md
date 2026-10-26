@@ -91,3 +91,10 @@
 - The AI judge (v2) looks for new ones. It's stricter than v1 but over-flags a little and still misses some, so it's a filter, not the final word.
 - The human approval in WordPress is the final gate.
 - Prompt tuning is time-boxed: after v4, we move on unless results get worse.
+
+## 2026-10-26: Daily credential check
+
+- Runs at 7am Lagos (cron(0 6 * * ? *) in UTC). It tests the HubSpot key on lead-intake, the WordPress password on publisher, and Bedrock access.
+- It reads each key from the Lambda that uses it, so it tests the real key, not a copy. Its permission to read Lambda settings is limited to those two functions.
+- One email when anything fails, naming the key and what to do. If the checker itself crashes, its own Errors alarm fires instead.
+- Known limits: the HubSpot check only proves read access, not write. The Tally signing secret can't be tested from here. If the checker stopped running altogether, nothing would notice yet (fix later: an alarm when it hasn't run for a day). Long term, keys belong in Secrets Manager.

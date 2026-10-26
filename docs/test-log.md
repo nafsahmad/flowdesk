@@ -44,3 +44,5 @@
 | 2026-10-26 | SNS topic flowdesk-alerts, test message | Email arrives | Topic created in us-east-1, email subscription confirmed. Test message "FlowDesk test alert" arrived in the inbox | Yes |
 | 2026-10-26 | Errors alarms on lead-intake, content-generator and publisher | All three created, OK state |    | Yes |
 | 2026-10-26 | Drill 1: wrong HUBSPOT_KEY on lead-intake | Alarm email, 401 in logs, lead recovered by Tally retry after fix, OK email |    | Yes |
+| 2026-10-26 | Credential check, all healthy | 3 checked, 0 problems, no email | 3 checked, 0 problems, no email | Pass |
+| 2026-10-26 | Drill 2: revoked WordPress password | Email naming the WordPress password (401), then 0 problems after rotation |  |  |
