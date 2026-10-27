@@ -7,7 +7,7 @@ instead of calling Bedrock. Everything else calls ask() and never knows which.
 import json
 import os
 
-MODEL_ID = os.environ.get("FLOWDESK_MODEL_ID", "us.amazon.nova-2-lite-v1:0")
+MODEL_ID = os.environ.get("FLOWDESK_MODEL_ID", "eu.amazon.nova-2-lite-v1:0")
 REGION = "eu-north-1"
 
 
@@ -28,12 +28,17 @@ def ask(system_prompt, user_prompt, max_tokens=2000, temperature=0.7):
     import boto3  # only needed when calling the real Bedrock
 
     client = boto3.client("bedrock-runtime", region_name=REGION)
-    response = client.converse(
-        modelId=MODEL_ID,
-        system=[{"text": system_prompt}],
-        messages=[{"role": "user", "content": [{"text": user_prompt}]}],
-        inferenceConfig={"maxTokens": max_tokens, "temperature": temperature},
-    )
+    try:
+        response = client.converse(
+            modelId=MODEL_ID,
+            system=[{"text": system_prompt}],
+            messages=[{"role": "user", "content": [{"text": user_prompt}]}],
+            inferenceConfig={"maxTokens": max_tokens, "temperature": temperature},
+        )
+    except Exception as e:
+        raise RuntimeError(
+            f"Bedrock call failed (model {MODEL_ID!r}, region {REGION!r}): {e}"
+        ) from e
     blocks = response["output"]["message"]["content"]
     return "".join(block.get("text", "") for block in blocks)
 
@@ -88,8 +93,17 @@ FAKE_CAPTION_B = (
     "Book a 15-minute demo: {link}"
 )
 
+FAKE_SUMMARY = (
+    "The ad spend in this report is sample data.\n\n"
+    "What happened\nLeads arrived from both caption variants.\n\n"
+    "What worked\nBoth variants produced leads.\n\n"
+    "What failed\nSome leads arrived without a variant.\n\n"
+    "What should happen next\nShare only tracked links. Keep testing both variants."
+)
 
 def _fake_reply(prompt):
+    if "weekly marketing assessment" in prompt:
+        return FAKE_SUMMARY
     risky = "Mention the results" in prompt
     if "Score each from 1" in prompt:
         copy = prompt.split("The copy to review:", 1)[-1]

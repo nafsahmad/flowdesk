@@ -26,6 +26,7 @@
 |---|---|---|---|---|
 | flowdesk-local | Windows environment variable `HUBSPOT_KEY` | crm.objects.contacts.read, crm.objects.contacts.write | 2026-10-24 | 2027-04-24 |
 | flowdesk-lead-intake | Lambda environment variable on flowdesk-lead-intake | crm.objects.contacts.read, crm.objects.contacts.write | 2026-10-24 | 2027-04-24 |
+| flowdesk-weekly-report | HUBSPOT_KEY env var on flowdesk-weekly-report (eu-north-1) | crm.objects.contacts.read (read only) | 2026-10-26 | 2027-04-26 |
 
 **Why only two scopes:** my scripts only read and update contacts. A key limited to that can't do much damage if it leaks.
 
@@ -105,3 +106,42 @@
 - Lost-lead checks count distinct submission IDs, so Tally's retries don't look like lost leads.
 - lead-intake logs each lead's variant (or "none"), so leads without attribution can be found.
 - Alarms only catch crashes. Silent data problems, like missing attribution, are caught by the searches and the weekly report.
+
+
+## 2026-10-26: Weekly report
+
+**What it does:** every Monday, it pulls the last 7 days of new HubSpot contacts, joins them with ad spend by campaign and variant, works out the metrics, gets a written summary from Bedrock, saves the report to S3 and emails it.
+
+**How it runs**
+- Lambda `flowdesk-weekly-report` in eu-north-1, Python 3.12, timeout 2 minutes.
+- Schedule: EventBridge rule `flowdesk-weekly-report-monday`, `cron(0 7 ? * MON *)`. That's 07:00 UTC, which is 08:00 Lagos.
+- Environment variables: `HUBSPOT_KEY` (read-only key `flowdesk-weekly-report`), `CONTENT_BUCKET`, `SNS_TOPIC_ARN` (the eu-north-1 `flowdesk-alerts` topic).
+- Permissions (`flowdesk-weekly-report-access`): read `inputs/`, write `reports/`, publish to `flowdesk-alerts`, call Nova 2 Lite through the EU profile. Nothing else.
+- Alarm: `flowdesk-weekly-report-errors`.
+- The credential check tests its HubSpot key every morning.
+
+**Data**
+- Leads: HubSpot search for contacts created in the last 7 days (`createdate` GTE the start of the period).
+- Spend: `inputs/ad_spend_SAMPLE.csv` in S3. It's made-up data, labelled SAMPLE in the file name, the email subject and the email body. Only rows with `week_start` inside the period are counted.
+- Customers and revenue come from HubSpot's lifecycle stage (`customer`) and `fd_revenue`.
+
+**How the numbers are worked out**
+- Both tables are loaded into an in-memory SQLite database. Each side is totalled before joining, because joining first would count each week's spend once per lead and inflate every cost.
+- Rows are by campaign and variant. A UNION of keys keeps leads that have no spend, and `IS` in the join lets leads with no campaign match their own group.
+- Python works out CTR, CPC, CPM, CVR, CPA, CAC and ROAS, rounded to 2 places. Cost metrics only appear where there was spend: no spend means "no cost metrics", not $0. Dividing by zero gives "n/a", not a crash.
+- Totals cover paid rows only.
+- Data notes flag leads with no campaign, leads with a campaign but no variant, and leads from campaigns with no spend data.
+
+**The summary**
+- Bedrock (`eu.amazon.nova-2-lite-v1:0`, prompt `weekly_summary_v1.txt`, temperature 0.3) writes four parts: what happened, what worked, what failed, what should happen next.
+- Python does all the maths. The model only writes words.
+- Every number in the summary is checked against the table, allowing for normal rounding. If any number isn't in the table, the summary is withheld from the email and kept in the saved report as `withheld_summary` for review.
+
+**Output**
+- Saved to `reports/<date>.json` in S3.
+- Emailed through `flowdesk-alerts`, subject "FlowDesk weekly report (SAMPLE DATA) <start> to <end>".
+
+**Known limits and next steps**
+- Reports and alerts share one SNS topic. A separate reports topic would be cleaner.
+- If Bedrock fails, the whole report fails, even though the numbers were worked out fine. Next improvement: still email the numbers with "Summary unavailable", then fail the run so the alarm fires.
+- LTV, contribution margin and payback period aren't calculated, because there's no data on how long customers stay.

@@ -1,0 +1,22 @@
+You are writing FlowDesk's weekly marketing assessment for the team.
+
+This week's numbers, as JSON. These are the only numbers you may use:
+{table}
+
+Data notes:
+{notes}
+
+Write four short sections with exactly these headings, each on its own line:
+What happened
+What worked
+What failed
+What should happen next
+
+Rules:
+- Start by saying once that the ad spend is sample data.
+- Use only numbers that appear in the JSON or the data notes above. Don't calculate new numbers, round differently or estimate.
+- Compare variant A with variant B wherever both exist.
+- If a number is null, say that data isn't available. Don't guess.
+- Mention every data note.
+- "What should happen next" gives 2 or 3 specific actions.
+- Under 250 words. No em dashes. No question marks.

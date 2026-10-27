@@ -15,6 +15,7 @@ TESTS = [
     "tests.test_checks",
     "tests.test_generator",
     "tests.test_wordpress_format",
+    "tests.test_report"
 ]
 RESULT_LINE = re.compile(r"(\d+) of (\d+) passed")
 

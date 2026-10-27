@@ -116,6 +116,26 @@ def upsert_contact(properties):
                              body={"properties": properties})
     return "created", created["id"]
 
+def search_contacts_created_since(since, properties):
+    """Every contact created at or after `since` (a datetime), page by page."""
+    body = {
+        "filterGroups": [{"filters": [{
+            "propertyName": "createdate",
+            "operator": "GTE",
+            "value": str(int(since.timestamp() * 1000)),
+        }]}],
+        "properties": list(properties),
+        "limit": 100,
+    }
+    contacts = []
+    while True:
+        data = _send_or_raise("POST", "/crm/v3/objects/contacts/search", body=body)
+        contacts.extend(data["results"])
+        after = data.get("paging", {}).get("next", {}).get("after")
+        if not after:
+            return contacts
+        body["after"] = after
+
 if __name__ == "__main__":
     # Quick self-test: fetch one contact and show its email.
     data = call_api("GET", "/crm/v3/objects/contacts", params={"limit": 1})

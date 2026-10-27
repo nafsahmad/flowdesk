@@ -62,6 +62,7 @@ CHECKS = [
     ("HubSpot key used by flowdesk-lead-intake", "flowdesk-lead-intake", check_hubspot),
     ("WordPress password used by flowdesk-publisher", "flowdesk-publisher", check_wordpress),
     ("Bedrock access for flowdesk-content-generator", None, check_bedrock),
+    ("HubSpot key used by flowdesk-weekly-report", "flowdesk-weekly-report", check_hubspot),
 ]
 
 
