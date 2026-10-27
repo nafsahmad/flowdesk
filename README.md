@@ -1,3 +1,5 @@
+**Demo video:** <https://youtu.be/ukVd7FQq2fg>
+
 # FlowDesk: a small AI marketing operations platform on AWS
 
 FlowDesk turns a content brief from a simple form into AI-written drafts, checks them, puts them in front of a human for approval, publishes them to WordPress, and tracks every lead they bring in all the way into HubSpot. Every Monday it emails a report of what happened, what worked, what failed and what to do next. It watches itself too: alarms, a daily credential check and saved log searches catch failures before they cost leads.
