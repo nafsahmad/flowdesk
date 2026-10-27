@@ -48,3 +48,10 @@
 | 2026-10-26 | Drill 2: revoked WordPress password | Email naming the WordPress password (401), then 0 problems after rotation |  |  |
 | 2026-10-26 | Saved Logs Insights searches (errors 24h, errors by Lambda, received vs written, never written, no variant) | All run and return sensible results |  |  |
 | 2026-10-26 | Drill 3: submission from the plain link (no UTMs) | No alarm. Lead in HubSpot with empty UTM fields. Caught by the "no variant" search |  |  |
+| F1 | 2026-10-27 | `python -m scripts.run_all_tests` with the two new test files | All 9 test files pass, 103 checks | Pass |
+| F2 | 2026-10-27 | Lambda Test tab, unsigned request | 401, log shows `step: signature, status: rejected`, nothing in `briefs/` | Pass |
+| F3 | 2026-10-27 | Opened the brief form in a private window | Asks for the password before showing the form | Pass |
+| F4 | 2026-10-27 | Submitted a real brief through the form | Logs show `received` then `saved ok`. New file in `briefs/` with `"source": "brief-form"` | Pass |
+| F5 | 2026-10-27 | Waited for the generator | `content/<brief_id>/draft.json` within 2 minutes, real model, status `checked` or `needs_review` | Pass |
+| F6 | 2026-10-27 | Ran the publisher | WordPress draft with the brief's topic | Pass |
+| F7 | 2026-10-27 | Drill: renamed `BRIEF_FORM_SIGNING_SECRET`, submitted a brief, put the name back | Alarm email, then Tally's retry delivers the brief within about 5 minutes, then OK email | Pass |

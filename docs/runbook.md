@@ -8,7 +8,7 @@ Everything lives in **AWS us-north-1 (Stockholm)**. If you can't find something 
 
 ## The system in one paragraph
 
-A marketer uploads a brief to S3. `flowdesk-content-generator` writes a blog post and two captions with Amazon Bedrock, checks them, and saves a record in `content/`. Every hour, `flowdesk-publisher` sends checked drafts to WordPress, waits for a human to approve and publish them, then confirms the live page. Readers click tracked links to the Tally form, and `flowdesk-lead-intake` scores each lead and upserts it into HubSpot. Every morning, `flowdesk-credential-check` tests every key. Any Lambda that fails emails the `flowdesk-alerts` list.
+A marketer fills in the FlowDesk Content Brief form, and `flowdesk-brief-intake` saves it as a brief in S3 (a developer can still upload one by hand). `flowdesk-content-generator` writes a blog post and two captions with Amazon Bedrock, checks them, and saves a record in `content/`. Every hour, `flowdesk-publisher` sends checked drafts to WordPress, waits for a human to approve and publish them, then confirms the live page. Readers click tracked links to the Tally form, and `flowdesk-lead-intake` scores each lead and upserts it into HubSpot. Every morning, `flowdesk-credential-check` tests every key. Any Lambda that fails emails the `flowdesk-alerts` list.
 
 ---
 
@@ -17,11 +17,12 @@ A marketer uploads a brief to S3. `flowdesk-content-generator` writes a blog pos
 | Thing | Name | Notes |
 |---|---|---|
 | S3 bucket | `flowdesk-content-nafs-2026` | `briefs/` in, `content/` out. Versioning on |
-| HTTP API | `flowdesk-api` | `POST /leads` goes to `flowdesk-lead-intake`. URL in the API Gateway console, kept out of this repo |
+| HTTP API | `flowdesk-api` | `POST /leads` goes to `flowdesk-lead-intake`, `POST /briefs` goes to `flowdesk-brief-intake`. URL in the API Gateway console, kept out of this repo |
 | Alert topic | SNS `flowdesk-alerts` | Email subscription to "my email" |
 | WordPress lab | InstaWP Sandbox, permanent site | Category `flowdesk` (slug). $2 a month, billed daily |
 | HubSpot | Free account | Custom properties `fd_score`, `fd_company_size`, `fd_utm_source`, `fd_utm_campaign`, `fd_utm_content`, |
 | Tally form | FlowDesk Demo Request | Hidden fields `utm_source`, `utm_campaign`, `utm_content`. Webhook to the HTTP API, signed |
+| Brief form | FlowDesk Content Brief (Tally) | Password protected (Settings, then Access). Webhook to `POST /briefs`, signed with its own secret |
 | Log retention | All FlowDesk log groups | 1 month |
 
 ---
@@ -58,6 +59,46 @@ A marketer uploads a brief to S3. `flowdesk-content-generator` writes a blog pos
 | Lead in HubSpot with empty `fd_utm_` fields, no alarm | Form opened from a link without UTMs (drill 3) | Not a code fault. Find them with the "no variant" search |
 
 **Safe to repeat:** yes. Contacts are upserted by email, so sending the same lead twice updates one contact instead of creating two.
+
+---
+
+## flowdesk-brief-intake
+
+**What it does:** turns a FlowDesk Content Brief form submission into a brief file in `briefs/`. The content generator picks it up from there, the same as a brief uploaded by hand.
+
+**Triggered by:** the brief form's Tally webhook, through API Gateway `POST /briefs`.
+
+**Settings:** Python 3.12, timeout 10 seconds.
+
+**Environment variables:** `CONTENT_BUCKET`, `BRIEF_FORM_SIGNING_SECRET` (the brief form's webhook secret, separate from the lead form's).
+
+**Permissions:** write `briefs/`. Nothing else. It can't read files, call Bedrock or touch `content/`.
+
+**How the brief is built:**
+- Form questions: Topic, Audience, Facts (one per line), Notes (optional), Your email.
+- The offer is always "A 15-minute demo", to match the call to action at the end of every post.
+- The `brief_id` is the topic's first words, the submission date and Tally's submission ID, for example `stop-chasing-clients-for-logins-in-week-20261027-mvz4kq`.
+- Limits: topic and audience up to 150 characters, notes up to 600, up to 10 facts of up to 300 characters each.
+
+**What it replies, and why:**
+
+| Situation | Reply | Logged as |
+|---|---|---|
+| Signature missing or wrong | 401, nothing saved | `step: signature, status: rejected` |
+| Body isn't JSON | 400 | `step: parse, status: rejected` |
+| An answer missing, too long, or more than 10 facts | 200, so Tally stops retrying | `step: validate, status: rejected` and the reason |
+| Brief saved | 200 | `step: received`, then `step: saved, status: ok` |
+| The same submission arrives again | 200, nothing new saved | `step: saved, status: duplicate` |
+| S3 fails | Error (500), so Tally retries | Traceback, and the Errors alarm fires |
+| `CONTENT_BUCKET` or `BRIEF_FORM_SIGNING_SECRET` not set | Error (500), so Tally retries | `step: config, status: error`, and the Errors alarm fires |
+
+**Errors seen so far:**
+
+| Symptom | Cause | Fix |
+|---|---|---|
+| `No handler.py` when building | The build script was given the folder path | Give it the Lambda's name only: `python -m scripts.build_lambda brief_intake` |
+
+**Safe to repeat:** yes. S3 only writes the brief if that file doesn't exist yet, so a repeated delivery can't start a second draft.
 
 ---
 
@@ -150,7 +191,7 @@ A marketer uploads a brief to S3. `flowdesk-content-generator` writes a blog pos
 
 ## Alerts and searches
 
-**Alarms** (all send In alarm and OK emails to `flowdesk-alerts`): `flowdesk-lead-intake-errors`, `flowdesk-content-generator-errors`, `flowdesk-publisher-errors`, `flowdesk-credential-check-errors`. Each fires on Errors of 1 or more in 5 minutes. Missing data counts as good.
+**Alarms** (all send In alarm and OK emails to `flowdesk-alerts`): `flowdesk-lead-intake-errors`, `flowdesk-content-generator-errors`, `flowdesk-publisher-errors`, `flowdesk-weekly-report-errors`, `flowdesk-brief-intake-errors`.`flowdesk-credential-check-errors`. Each fires on Errors of 1 or more in 5 minutes. Missing data counts as good.
 
 **Saved searches** (CloudWatch Logs Insights, folder `FlowDesk`):
 
@@ -161,6 +202,7 @@ A marketer uploads a brief to S3. `flowdesk-content-generator` writes a blog pos
 | FlowDesk leads received vs written (7d) | Weekly, or when lead numbers look low |
 | FlowDesk leads never written (7d) | The counts above don't match |
 | FlowDesk leads with no variant (7d) | Weekly. Catches silent attribution loss |
+| FlowDesk briefs rejected (7d) | Weekly, or when a marketer says their draft never showed up |
 
 **Alarms only catch crashes.** Data problems, like leads with no attribution, need the searches and the weekly review.
 
@@ -203,6 +245,10 @@ Make the new key **before** removing the old one, so nothing breaks in between.
 4. Submit a test lead and check it reaches HubSpot.
 5. Update the credentials table.
 
+**Brief form signing secret:** same steps as the Tally signing secret, using `BRIEF_FORM_SIGNING_SECRET` on `flowdesk-brief-intake` and the webhook settings on the brief form. Test it by submitting a brief and checking it lands in `briefs/`.
+
+**Brief form password:** change it in Tally (the form's Settings, then Access), then send the new one to the marketers. Nothing in AWS changes.
+
 **Laptop keys** (`flowdesk-local` HubSpot key, `flowdesk-publisher` WordPress password): same steps, but update them with `setx` and restart VS Code.
 
 The full list of keys, where each lives and when it's due for rotation is the credentials table in `docs/decisions.md`.
@@ -217,6 +263,7 @@ The full list of keys, where each lives and when it's due for rotation is the cr
 
 **Weekly:**
 - Run **leads received vs written** and **leads with no variant**.
+- Run **FlowDesk briefs rejected (7d)**. Anyone whose brief was rejected hasn't been told yet, so let them know why.
 - Check `content/` in S3 for `failed_checks` records, and read why they failed.
 - Add any new made-up claims you spot to `CLAIM_PHRASES` in `shared/checks.py`.
 
@@ -225,9 +272,12 @@ The full list of keys, where each lives and when it's due for rotation is the cr
 ## Known gaps
 
 - Reusing a `brief_id` overwrites its record, even after the post is in WordPress.
+- A brief uploaded by hand can still reuse a `brief_id` and overwrite its record. Briefs from the form can't.
 - The judge over-flags some sentences and misses others, so the human approval is the real gate.
-- Briefs fix the call to action as a demo, even when the offer is a trial.
+- The call to action is always a demo. The form fixes the offer to match, but a hand-uploaded brief can still ask for a trial.
 - Captions are only available inside the record in S3.
 - If WordPress creates a draft but saving the record fails, the next run could create a second draft.
 - Keys are stored as Lambda environment variables. They belong in AWS Secrets Manager.
 - Nothing alerts if the credential check stops running.
+- A rejected brief only shows up in the logs. The person who sent it isn't told.
+- The brief form has one shared password, so "Your email" is whatever the person typed.

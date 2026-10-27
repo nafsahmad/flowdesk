@@ -34,7 +34,7 @@ def lambda_handler(event, context):
 
     contacts = search_contacts_created_since(start, PROPERTIES)
     spend_text = s3.get_object(Bucket=BUCKET, Key=SPEND_KEY)["Body"].read().decode("utf-8")
-    spend_rows = read_spend_csv(spend_text, start.date().isoformat())
+    spend_rows = read_spend_csv(spend_text, start.date().isoformat(), end.date().isoformat())
 
     report = build_report(contacts, spend_rows, start.date().isoformat(), end.date().isoformat())
     summary, unsupported = write_summary(report)

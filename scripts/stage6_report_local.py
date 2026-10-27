@@ -23,7 +23,7 @@ def main():
 
     contacts = search_contacts_created_since(start, PROPERTIES)
     with open("sample_data/ad_spend_SAMPLE.csv", encoding="utf-8") as f:
-        spend_rows = read_spend_csv(f.read(), start.date().isoformat())
+        spend_rows = read_spend_csv(f.read(), start.date().isoformat(), end.date().isoformat())
 
     report = build_report(contacts, spend_rows, start.date().isoformat(), end.date().isoformat())
     summary, unsupported = write_summary(report)

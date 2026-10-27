@@ -13,6 +13,7 @@ import sqlite3
 
 from shared import llm
 from shared.prompts import fill, load
+from datetime import date, timedelta
 
 SUMMARY_PROMPT = "weekly_summary_v1.txt"
 NUMBER = re.compile(r"\d+(?:\.\d+)?")
@@ -65,10 +66,20 @@ def _ratio(top, bottom, scale=1):
     return round(top / bottom * scale, 2) if bottom else None
 
 
-def read_spend_csv(text, since_date):
-    """Rows from the spend file whose week starts on or after since_date (YYYY-MM-DD)."""
-    return [row for row in csv.DictReader(io.StringIO(text))
-            if row["week_start"] >= since_date]
+def read_spend_csv(text, start, end):
+    """Rows from the spend file whose week overlaps the report period.
+
+    Each row covers 7 days from week_start, so a week that began before the
+    period but ends inside it still counts. Dates are YYYY-MM-DD.
+    """
+    first, last = date.fromisoformat(start), date.fromisoformat(end)
+    rows = []
+    for row in csv.DictReader(io.StringIO(text)):
+        week_start = date.fromisoformat(row["week_start"])
+        week_end = week_start + timedelta(days=6)
+        if week_start <= last and week_end >= first:
+            rows.append(row)
+    return rows
 
 
 def add_metrics(row):

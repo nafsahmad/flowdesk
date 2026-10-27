@@ -32,13 +32,16 @@ CONTACTS = [
 
 
 def main():
-    spend = read_spend_csv(SPEND_CSV, "2026-10-19")
+    spend = read_spend_csv(SPEND_CSV, "2026-10-19", "2026-10-26")
     report = build_report(CONTACTS, spend, "2026-10-19", "2026-10-26")
     rows = {(r["campaign"], r["variant"]): r for r in report["rows"]}
     a, b = rows[("oct-launch", "A")], rows[("oct-launch", "B")]
 
     checks = [
         ("Spend from before the period is left out", len(spend) == 2),
+        ("A week that started before the period but overlaps it still counts",
+         [r["utm_content"] for r in read_spend_csv(SPEND_CSV, "2026-10-20", "2026-10-27")]
+         == ["A", "B"]),
         ("Spend counted once, not once per lead (no fan-out)", a["spend"] == 40.0),
         ("Variant A: 2 leads, 1 customer, $400 revenue",
          (a["leads"], a["customers"], a["revenue"]) == (2, 1, 400.0)),

@@ -43,7 +43,10 @@
 - Look up by email with `idProperty=email` (a direct read), then PATCH if found or POST if not.
 - Webhook code raises errors instead of returning None, so a failed run makes Tally retry.
 - Known limitation: if the same email is submitted twice within the same second, both runs could try to create it. HubSpot would reject the second with a 409. Handling that is a later improvement.
+
 | TALLY_SIGNING_SECRET | Tally webhook settings + Lambda env var on flowdesk-lead-intake | Signs and checks webhook requests | 2026-10-24 | 2027-04-24 |
+| BRIEF_FORM_SIGNING_SECRET | Tally webhook signing secret, FlowDesk Content Brief form | `flowdesk-brief-intake` environment variable, and the brief form's webhook settings in Tally | 2026-10-27 | Rotate if leaked, or yearly |
+| Brief form password | Tally form password, FlowDesk Content Brief | Tally form settings (Access), and my password manager | 2026-10-27 | Change when someone leaves the team |
 
 
 ## 2026-10-24: Checking Tally signatures
@@ -145,3 +148,23 @@
 - Reports and alerts share one SNS topic. A separate reports topic would be cleaner.
 - If Bedrock fails, the whole report fails, even though the numbers were worked out fine. Next improvement: still email the numbers with "Summary unavailable", then fail the run so the alarm fires.
 - LTV, contribution margin and payback period aren't calculated, because there's no data on how long customers stay.
+
+
+## 2026-10-27: Brief form for marketers
+
+**Decision:** Marketers request content through a second Tally form, "FlowDesk Content Brief". A new Lambda, `flowdesk-brief-intake`, checks the webhook signature, turns the answers into a brief and saves it to `briefs/`. The content generator takes it from there, unchanged.
+
+**Why:**
+- Nobody needs AWS access or has to write JSON. Before this, only someone with S3 access could request content.
+- The generator didn't change at all. The form writes the same brief file a person would upload, so the checks, the judge and the human approval all work the same way.
+- The `brief_id` is built from the topic, the submission date and Tally's submission ID. Two requests on the same topic can't overwrite each other, and the same submission arriving twice gets the same ID.
+- The Lambda saves with an S3 conditional write ("only if this file doesn't exist yet"). Tally retries a delivery when it doesn't get a reply in time, so this stops one request turning into two drafts.
+- The form doesn't ask for an offer. Every post ends with the 15-minute demo call to action, so a typed offer could promise one thing and link to another.
+- The form is password protected in Tally, and the Lambda only accepts requests signed with the form's own secret. Human approval in WordPress is still the final gate, so the worst a bad brief can do is create a draft that someone deletes.
+- The Lambda can only write to `briefs/`. It can't read anything, call Bedrock or touch `content/`.
+- Unlike lead intake, a missing setting raises an error instead of replying 500, so the Errors alarm catches it.
+
+**Trade-offs:**
+- A brief the form can't check (more than 10 facts, a fact over 300 characters) is rejected in the logs only. The person who sent it isn't told yet. The weekly "briefs rejected" search covers this for now.
+- One shared password means the system can't prove which marketer sent a brief. "Your email" is self-reported.
+- Briefs uploaded by hand can still reuse a `brief_id`.
