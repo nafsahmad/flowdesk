@@ -6,7 +6,7 @@ A small integration that takes every event sign-up from a Tally form, saves the 
 - **Existing customers** are posted to **#customer-success** so their success manager can say hello before the event.
 - **Repeat sign-ups** update the existing contact instead of creating a duplicate, and never move a contact back to an earlier lifecycle stage.
 
-![Slack alerts for a prospect and a customer](slack-alerts1.png)
+![Slack alerts for a prospect](slack-alerts2.png)
 ![Slack alerts for a customer](slack-alerts.png)
 
 ## How it works
@@ -25,7 +25,7 @@ Tally form ──webhook──▶ AWS Lambda (Python) ──▶ HubSpot contact
 
 ## Built with
 
-- Python 3.13 on AWS Lambda (standard library only, nothing to install)
+- Python 3.12 on AWS Lambda (standard library only, nothing to install)
 - HubSpot CRM API v3 (private app token, contacts read and write scopes)
 - Slack incoming webhooks
 - Tally webhooks with signature verification
