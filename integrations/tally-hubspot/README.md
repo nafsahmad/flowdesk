@@ -6,7 +6,8 @@ A small integration that takes every event sign-up from a Tally form, saves the 
 - **Existing customers** are posted to **#customer-success** so their success manager can say hello before the event.
 - **Repeat sign-ups** update the existing contact instead of creating a duplicate, and never move a contact back to an earlier lifecycle stage.
 
-![Slack alerts for a prospect and a customer](slack-alerts.png)
+![Slack alerts for a prospect and a customer](slack-alerts1.png)
+![Slack alerts for a customer](slack-alerts.png)
 
 ## How it works
 
