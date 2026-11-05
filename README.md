@@ -129,3 +129,6 @@ Python 3.12 · AWS Lambda, API Gateway, S3, SNS, CloudWatch, EventBridge, IAM ·
 ## How this was built
 
 I used Claude: to plan the build, explain concepts and draft code. I set up every service, ran every test and drill, and debugged what broke.
+
+
+- [Event sign-ups to HubSpot and Slack](integrations/tally-hubspot/)
